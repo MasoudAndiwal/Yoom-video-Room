@@ -17,15 +17,14 @@
     "@radix-ui/react-toast": "^1.2.14",
     "@stream-io/node-sdk": "^0.4.24",
     "@stream-io/video-react-sdk": "^1.18.1",
-    "@vime/react": "^5.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
     "next": "^15.3.3",
     "or": "^0.2.0",
-    "react": "^19.0.0",
+    "react": "^17.0.2",
     "react-datepicker": "^8.4.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^17.0.2",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -40,5 +39,4 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
-
 }
