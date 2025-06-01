@@ -48,15 +48,15 @@ function MeetingRoom() {
 
   // Function to handle layout selection with proper format conversion
   const handleLayoutChange = (layoutType: string) => {
-    // Convert layout names to the correct format
-    const formattedLayout = layoutType.toLowerCase().replace('-', '') as CallLayoutType;
+    // Process the input string
+    const processed = layoutType.toLowerCase().replace(' ', '-');
     
-    // Map to the correct enum value
-    if (formattedLayout === 'grid') {
+    // Set the layout based on the processed input
+    if (processed === 'grid') {
       setLayout('grid');
-    } else if (formattedLayout === 'speakerleft') {
+    } else if (processed === 'speaker-left') {
       setLayout('speaker-left');
-    } else if (formattedLayout === 'speakerright') {
+    } else if (processed === 'speaker-right') {
       setLayout('speaker-right');
     }
   };

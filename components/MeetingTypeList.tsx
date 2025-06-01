@@ -40,7 +40,7 @@ function MeetingTypeList() {
   const [callDetails, setcallDetails] = useState<Call>()
   
   // Stores the meeting link for copying in success modals
-  const [, setMeetingLink] = useState('')
+  const [meetingLink, setMeetingLink] = useState('')
   
   // Tracks whether to show success modal after joining/scheduling a meeting
   const [joinSuccess, setJoinSuccess] = useState(false)

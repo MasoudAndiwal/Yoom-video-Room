@@ -9,7 +9,7 @@ import MeetingRoom from '@/components/MeetingRoom';
 import { useGetCallById } from '@/hooks/useGetCallById';
 import Loader from '@/components/Loader';
 
-function Meeting({ params }: { params: { id: string } }) {
+function Meeting({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = React.use(params);
     const {user , isLoaded} = useUser();
     const [isSetupComplete, setIsSetupComplete] = useState(false)
