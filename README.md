@@ -213,3 +213,144 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Clerk](https://clerk.com) for authentication services
 - [Next.js](https://nextjs.org) team for the amazing framework
 - [Vercel](https://vercel.com) for hosting and deployment solutions
+
+
+## Using with Electron.js
+
+To package and run this Next.js application as a desktop application using Electron.js, you would typically follow these general steps:
+
+1.  **Install Electron and Electron Builder**:
+    Add Electron and Electron Builder (for packaging) to your project.
+    ```bash
+    npm install --save-dev electron electron-builder
+    # or
+    yarn add --dev electron electron-builder
+    # or
+    pnpm add --save-dev electron electron-builder
+    # or
+    bun add --dev electron electron-builder
+    ```
+
+2.  **Create a Main Electron File**:
+    Create a `main.js` (or similar, e.g., `electron/main.js`) in your project's root or a dedicated `electron` directory. This file will be the main process for your Electron app. It will create browser windows to render your Next.js application.
+
+    A basic `main.js` might look like this:
+    ```javascript
+    const { app, BrowserWindow } = require('electron');
+    const path = require('path');
+    const isDev = require('electron-is-dev');
+
+    function createWindow() {
+      const win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+          nodeIntegration: true,
+          contextIsolation: false, // Consider security implications
+        },
+      });
+
+      // Load the Next.js app
+      // In development, load from the Next.js dev server
+      // In production, load the exported static HTML
+      win.loadURL(
+        isDev
+          ? 'http://localhost:3000' // Your Next.js dev server URL
+          : `file://${path.join(__dirname, '../out/index.html')}` // Path to Next.js export
+      );
+
+      if (isDev) {
+        win.webContents.openDevTools();
+      }
+    }
+
+    app.whenReady().then(createWindow);
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit();
+      }
+    });
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+    ```
+
+3.  **Configure `package.json`**:
+    -   Set the `main` field in your `package.json` to point to your Electron main file (e.g., `"main": "electron/main.js"`).
+    -   Add scripts to run and build the Electron app.
+        -   You'll need a script to start Next.js and Electron concurrently for development.
+        -   You'll need a script to first build your Next.js app (e.g., `next build && next export`) and then build the Electron app using `electron-builder`.
+
+    Example scripts:
+    ```json
+    "scripts": {
+      // ... your existing scripts
+      "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+      "electron:build": "next build && next export && electron-builder"
+    },
+    ```
+    You might need to install `concurrently` and `wait-on`:
+    ```bash
+    npm install --save-dev concurrently wait-on
+    ```
+
+4.  **Next.js Configuration for Static Export**:
+    If you plan to package your Next.js app for production with Electron, you'll likely need to configure it for static HTML export. In your `next.config.js` (or `next.config.mjs`):
+    ```javascript
+    /** @type {import('next').NextConfig} */
+    const nextConfig = {
+      // ... other configurations
+      output: 'export', // For Next.js 13.4+
+      // For older versions, you might need `target: 'serverless'` and then use `next export`
+      images: {
+        unoptimized: true, // Required for `next export` if using next/image
+      },
+    };
+
+    module.exports = nextConfig;
+    ```
+    Ensure your application is compatible with static export, as some Next.js features (like API routes or dynamic server-side rendering in the traditional sense) behave differently or require workarounds in a purely static export.
+
+5.  **Electron Builder Configuration**:
+    Add configuration for `electron-builder` in your `package.json` or a separate `electron-builder.yml` file. This specifies how your app should be built for different platforms (Windows, macOS, Linux).
+    Example in `package.json`:
+    ```json
+    "build": {
+      "appId": "com.example.yoomvideoroom",
+      "productName": "Yoom Video Room",
+      "directories": {
+        "output": "dist_electron", // Output directory for packaged app
+        "buildResources": "build_assets" // Directory for build resources like icons
+      },
+      "files": [
+        "electron/**/*", // Include electron main process files
+        "out/**/*",      // Include Next.js static export
+        "package.json"
+      ],
+      "win": {
+        "target": "nsis"
+      },
+      "mac": {
+        "target": "dmg"
+      },
+      "linux": {
+        "target": "AppImage"
+      }
+    }
+    ```
+
+6.  **Run and Build**:
+    -   **Development**: Run your Next.js dev server and Electron app concurrently.
+        ```bash
+        npm run electron:dev
+        ```
+    -   **Production Build**: Build your Next.js app, export it, and then package it with Electron Builder.
+        ```bash
+        npm run electron:build
+        ```
+
+This provides a basic outline. Integrating Next.js with Electron can have nuances depending on your project's specific needs, especially regarding routing, data fetching, and inter-process communication if required. Refer to the official Electron and Next.js documentation for more detailed guidance.
