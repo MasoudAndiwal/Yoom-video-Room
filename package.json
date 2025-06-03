@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next export"
+    "export": "next export",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on --httpTimeout 1000 --interval 1000 --delay 500 --window 1000 tcp:3000 && electron electron/main.js\""
   },
   "dependencies": {
     "@clerk/nextjs": "^6.20.0",
@@ -33,10 +34,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
+    "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^8.0.3"
   }
 }

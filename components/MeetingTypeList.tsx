@@ -9,6 +9,8 @@ import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { useToast } from "@/hooks/use-toast";
 import { title } from 'process';
 import { Input } from './ui/input';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 
 
@@ -178,8 +180,28 @@ function MeetingTypeList() {
         handleClick={() => {
           // Validate link before proceeding
           if (values.link) {
+            // Process the link to ensure proper URL format
+            let formattedLink = values.link.trim();
+            
+            // Check if the link is a valid URL with http/https or add https://
+            if (!formattedLink.startsWith('http://') && !formattedLink.startsWith('https://')) {
+              formattedLink = `https://${formattedLink}`;
+            }
+            
+            // Handle case where the link might be a relative path on the same site
+            // If it's a meeting ID or path without domain, ensure proper routing
+            if (formattedLink.includes('/meeting/')) {
+              // Extract just the meeting ID if possible
+              const meetingIdMatch = formattedLink.match(/\/meeting\/([\w-]+)/);
+              if (meetingIdMatch && meetingIdMatch[1]) {
+                // Navigate using the extracted meeting ID
+                router.push(`/meeting/${meetingIdMatch[1]}`);
+                return;
+              }
+            }
+            
             // Navigate directly to the meeting link
-            router.push(values.link);
+            router.push(formattedLink);
           } else {
             // Show error if no link provided
             toast({
@@ -215,18 +237,24 @@ function MeetingTypeList() {
         >
           <div className="flex flex-col gap-3">
             {/* Date and Time Selector */}
-            <input 
-              type="datetime-local" 
-              className="w-full bg-[#2D3142] text-white rounded-[5px] px-4 py-2 focus:outline-none"
-              value={values.dateTime.toISOString().slice(0, 16)}
-              onChange={(e) => setvalues({...values, dateTime: new Date(e.target.value)})}
-            />
+          
             {/* Meeting Description Text Area */}
             <textarea 
               placeholder="Meeting description" 
               className="w-full bg-[#2D3142] text-white rounded-[5px] px-4 py-2 focus:outline-none"
               value={values.description}
               onChange={(e) => setvalues({...values, description: e.target.value})}
+            />
+              <DatePicker
+              selected={values.dateTime}
+              onChange={(date) => setvalues({ ...values, dateTime: date || new Date() })}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={5}
+              dateFormat="MMMM d, yyyy h:mm aa"
+              className="w-full bg-[#2D3142] text-white rounded-[5px] px-4 py-2 focus:outline-none"
+              minDate={new Date()} // Prevent selecting past dates/times
+              wrapperClassName="w-full"
             />
           </div>
         </MeetingModal>
@@ -241,7 +269,7 @@ function MeetingTypeList() {
           title="Meeting Created"
           handleClick={() => {
             // Prepend https:// if not already present and copy to clipboard
-            const linkToCopy = meetingLink.startsWith('https://') ? meetingLink : `https://${meetingLink}`;
+            const linkToCopy =`${meetingLink}`;
             navigator.clipboard.writeText(linkToCopy);
             toast({ title: 'Link Copied' });
           }}

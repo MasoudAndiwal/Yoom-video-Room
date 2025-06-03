@@ -98,8 +98,8 @@ function CallList({type}: {type: 'ended' | 'upcoming' | 'recordings'}) {
                     : '/icons/recordings.svg'
                 }
                 title={type === 'recordings' 
-                    ? `Recording ${(meeting as CallRecording).id?.substring(0, 10) || ''}` 
-                    : ((meeting as Call).state?.custom?.description?.substring(0, 26) || 'Personal Meeting ')
+                    ? `Recording: ${(meeting as CallRecording).filename.substring(0 , 25) || (meeting as CallRecording).id?.substring(0, 10) || 'Untitled Recording'}` 
+                    : ((meeting as Call).state?.custom?.description?.substring(0, 20) || '')
                 }
                 date={type === 'recordings' 
                     ? (meeting as CallRecording).start_time?.toLocaleString() || 'Unknown date'
