@@ -7,7 +7,7 @@ export const SidebarLinks = [
     } ,
     {
         name: "Upcoming",
-        icon: '/icons/Upcoming.svg',
+        icon: '/icons/UP.svg',
         href: "/Upcoming"
     },
     {
